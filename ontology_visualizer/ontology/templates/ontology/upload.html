@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h2>Upload Ontology File</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="ontology_file">
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

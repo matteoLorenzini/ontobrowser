@@ -1,0 +1,17 @@
+<ul class="list-group">
+    {% for node, children in tree.items %}
+        <li class="list-group-item">
+            {% if children %}
+                <span class="toggle-button" onclick="toggleSubclasses(this)">+</span>
+            {% else %}
+                <span class="toggle-button" style="visibility: hidden;">+</span>
+            {% endif %}
+            <a href="javascript:void(0);" onclick="loadClassDetails('{{ node }}')">{{ node }}</a>
+            {% if children %}
+                <ul class="list-group mt-2" style="display: none;">
+                    {% include 'ontology/tree_node.html' with tree=children %}
+                </ul>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>

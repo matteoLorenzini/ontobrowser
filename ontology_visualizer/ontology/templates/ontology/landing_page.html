@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ontology Browser</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Ontology Browser</h1>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h2>Load Ontology from Local Machine</h2>
+                <form action="{% url 'upload_ontology' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ontology_file">Select ontology file:</label>
+                        <input type="file" class="form-control" id="ontology_file" name="ontology_file" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h2>Load Existing Ontology</h2>
+                <form action="{% url 'load_existing_ontology' %}" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ontology_name">Select ontology:</label>
+                        <select class="form-control" id="ontology_name" name="ontology_name" required>
+                            {% for ontology in ontologies %}
+                                <option value="{{ ontology }}">{{ ontology }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Load</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

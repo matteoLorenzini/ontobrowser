@@ -1,0 +1,19 @@
+{% extends 'ontology/tree.html' %}
+
+{% block details %}
+<h2>Class Details</h2>
+<p><strong>Label:</strong> {{ details.label }}</p>
+<p><strong>Comment:</strong> {{ details.comment }}</p>
+<p><strong>Subclasses:</strong></p>
+<ul>
+    {% for subclass in details.subclasses %}
+        <li>{{ subclass }}</li>
+    {% endfor %}
+</ul>
+<p><strong>Superclasses:</strong></p>
+<ul>
+    {% for superclass in details.superclasses %}
+        <li>{{ superclass }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

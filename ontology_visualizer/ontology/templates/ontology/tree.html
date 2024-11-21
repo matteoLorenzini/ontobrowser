@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ontology Browser</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        #tree {
+            border-right: 1px solid #ccc;
+            padding-right: 10px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        #details {
+            padding-left: 10px;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        .toggle-button {
+            cursor: pointer;
+            margin-right: 5px;
+        }
+    </style>
+    <script>
+        function loadClassDetails(classUri) {
+            fetch(`/ontology/class-details/?class_uri=${encodeURIComponent(classUri)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const detailsDiv = document.getElementById('details');
+                    detailsDiv.innerHTML = `
+                        <h2>Class Details</h2>
+                        <p><strong>Label:</strong> ${data.label || 'N/A'}</p>
+                        <p><strong>Comment:</strong> ${data.comment || 'N/A'}</p>
+                        <p><strong>Subclasses:</strong></p>
+                        <ul>${data.subclasses.map(subclass => `<li><a href="javascript:void(0);" onclick="loadClassDetails('${subclass}')">${subclass}</a></li>`).join('')}</ul>
+                        <p><strong>Superclasses:</strong></p>
+                        <ul>${data.superclasses.map(superclass => `<li><a href="javascript:void(0);" onclick="loadClassDetails('${superclass}')">${superclass}</a></li>`).join('')}</ul>
+                    `;
+                });
+        }
+
+        function loadPropertyDetails(propertyUri) {
+            fetch(`/ontology/property-details/?property_uri=${encodeURIComponent(propertyUri)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const detailsDiv = document.getElementById('details');
+                    detailsDiv.innerHTML = `
+                        <h2>Property Details</h2>
+                        <p><strong>Label:</strong> ${data.label || 'N/A'}</p>
+                        <p><strong>Comment:</strong> ${data.comment || 'N/A'}</p>
+                        <p><strong>Domain:</strong></p>
+                        <ul>${data.domain.map(domain => `<li><a href="javascript:void(0);" onclick="loadClassDetails('${domain}')">${domain}</a></li>`).join('')}</ul>
+                        <p><strong>Range:</strong></p>
+                        <ul>${data.range.map(range => `<li><a href="javascript:void(0);" onclick="loadClassDetails('${range}')">${range}</a></li>`).join('')}</ul>
+                    `;
+                });
+        }
+
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tabcontent");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tablinks");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        function toggleSubclasses(element) {
+            const subclasses = element.nextElementSibling.nextElementSibling;
+            if (subclasses.style.display === "none") {
+                subclasses.style.display = "block";
+                element.textContent = "-";
+            } else {
+                subclasses.style.display = "none";
+                element.textContent = "+";
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="tab">
+                    <button class="tablinks btn btn-primary w-100" onclick="openTab(event, 'Classes')">Classes</button>
+                    <button class="tablinks btn btn-primary w-100" onclick="openTab(event, 'Properties')">Properties</button>
+                </div>
+
+                <div id="Classes" class="tabcontent mt-4">
+                    <div id="tree" class="list-group">
+                        <h2>Ontology Tree</h2>
+                        {% load ontology_tags %}
+                        {% render_tree ontology_tree %}
+                    </div>
+                </div>
+
+                <div id="Properties" class="tabcontent mt-4">
+                    <div id="tree" class="list-group">
+                        <h2>Ontology Properties</h2>
+                        <ul class="list-group">
+                            {% for prop in ontology_properties %}
+                                <li class="list-group-item"><a href="javascript:void(0);" onclick="loadPropertyDetails('{{ prop }}')">{{ prop }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="details" class="col-md-9 mt-4">
+                <h2>Select a class or property to see details</h2>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementsByClassName('tablinks')[0].click();
+    </script>
+</body>
+</html>
